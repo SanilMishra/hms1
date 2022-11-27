@@ -322,11 +322,28 @@ input {
   font-weight: 600;
   color: #888;
   font-size: 14px;
-  text-align: center;
+  /* padding-left: 28px; */
+}
+
+.sayooj1{
+  width:100%;
+  height:100%;
+  border-radius: 5px;
+  font-weight: 600;
+  color: #888;
+  font-size: 14px;
+  text-align: left !important;
   /* padding-left: 28px; */
 }
 
 .sayooj option{
+  font-weight: 600;
+  color: #888;
+  font-size: 14px;
+  border-radius: 5px;
+}
+
+.sayooj1 option{
   font-weight: 600;
   color: #888;
   font-size: 14px;
@@ -359,6 +376,72 @@ input {
   border:1px solid white; */
   width:100%;
   /* height:100%; */
+}
+
+.hit {
+  text-align: left;
+}
+
+.caption {
+  text-align: center;
+  position: absolute;
+  width: 80%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.do {
+  background-color: aliceblue !important;
+  height: 56.8px;
+}
+
+.form-textbox option {
+  text-align: left;
+}
+
+/* .form-textbox2 {
+  height: 56.8px;
+  width: 100%;
+} */
+
+.form {
+  background-color: rgba(65, 72, 77, 0.85);
+  border-radius: 20px;
+  box-sizing: border-box;
+  height: 600px;
+  padding: 20px;
+  width: 400px;
+  margin-top: 100px;
+}
+optgroup { font-size:13px; }
+.input-container {
+  height: 50px;
+  position: relative;
+  width: 100%;
+}
+
+.ic3 {
+  margin-top: 30px;
+  color: #888;
+}
+
+.input1 {
+  background-color: #fff;
+  border-radius: 12px;
+  border: 0;
+  box-sizing: border-box;
+  color: #888;
+  font-size: 14px;
+  font-weight: 500;
+  height: 100%;
+  outline: 0;
+  padding: 4px 20px 0;
+  width: 100%;
 }
 
 .form-textbox label {
