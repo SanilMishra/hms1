@@ -13,6 +13,9 @@ urlpatterns = [
     path('student_module/',views.student_module,name="student_module"),
     path('hostel_manager_module/',views.hostel_manager_module,name="hostel_manager_module"),
     path('mess_manager_module/',views.mess_manager_module,name="mess_manager_module"),
-    path('ahm/',views.ahm,name="ahm")
+    path('ahm/',views.ahm,name="ahm"),
+    path('rhm/',views.rhm,name="rhm"),
+    path('amm/',views.amm,name="amm"),
+    path('rmm/',views.rmm,name="rmm")
     # path('dash/',views.dash,name="dash"),
 ]

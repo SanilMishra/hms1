@@ -161,3 +161,33 @@ def ahm(request):
             return redirect("../login")
     else:
         return redirect("../login")
+
+def rhm(request):
+    if request.session.has_key('user'):
+        user_details = request.session['user']
+        if user_details[1] == 1:
+            return render(request,"rhm.html")
+        else:
+            return redirect("../login")
+    else:
+        return redirect("../login")
+
+def amm(request):
+    if request.session.has_key('user'):
+        user_details = request.session['user']
+        if user_details[1] == 1:
+            return render(request,"rhm.html")
+        else:
+            return redirect("../login")
+    else:
+        return redirect("../login")
+
+def rmm(request):
+    if request.session.has_key('user'):
+        user_details = request.session['user']
+        if user_details[1] == 1:
+            return render(request,"rhm.html")
+        else:
+            return redirect("../login")
+    else:
+        return redirect("../login")
