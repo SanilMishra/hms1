@@ -176,7 +176,7 @@ def amm(request):
     if request.session.has_key('user'):
         user_details = request.session['user']
         if user_details[1] == 1:
-            return render(request,"rhm.html")
+            return render(request,"amm.html")
         else:
             return redirect("../login")
     else:
@@ -186,7 +186,7 @@ def rmm(request):
     if request.session.has_key('user'):
         user_details = request.session['user']
         if user_details[1] == 1:
-            return render(request,"rhm.html")
+            return render(request,"rmm.html")
         else:
             return redirect("../login")
     else:
