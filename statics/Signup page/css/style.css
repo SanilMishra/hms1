@@ -315,6 +315,18 @@ input {
   position:relative;
 }
 
+.rp {
+  padding-left: 175px;
+}
+
+.npg {
+  padding-left: 225px;
+}
+
+.ppg {
+  padding-left: 290px;
+}
+
 .sayooj{
   width: 100%;
   height: 100%;
@@ -322,7 +334,7 @@ input {
   font-weight: 600;
   color: #888;
   font-size: 14px;
-  /* padding-left: 28px; */
+  padding-left: 10px;
 }
 
 .sayooj1{
@@ -333,7 +345,7 @@ input {
   color: #888;
   font-size: 14px;
   text-align: left !important;
-  /* padding-left: 28px; */
+  padding: 20px;
 }
 
 .sayooj option{
@@ -520,7 +532,7 @@ input[type=checkbox]:not(old):checked + label > span:before {
   color: #FFF;
   border: none;
   padding: 15px 20px;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   font-family: Poppins;
   border-radius: 5px;

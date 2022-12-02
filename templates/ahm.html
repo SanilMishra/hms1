@@ -42,8 +42,8 @@
       </li>
       <li class="has-submenu"><a href="#section2">Manage Mess</a>
         <ul class="sub-menu2">
-          <li><a href="#" rel="sponsored" class="external">Appoint Mess Manager</a></li>
-          <li><a href="#" rel="sponsored" class="external">Remove Mess Manager</a></li>
+          <li><a href="{% url "HostelDesk:amm" %}" rel="sponsored" class="external">Appoint Mess Manager</a></li>
+          <li><a href="{% url "HostelDesk:rmm" %}" rel="sponsored" class="external">Remove Mess Manager</a></li>
         </ul>
       </li>
       <li class="has-submenu"><a href="#section2">Manage Students</a>
@@ -68,40 +68,48 @@
           <div class="caption">
             <div class="form">
               <div class="title"><em>Appoint</em> Hostel Manager</div>
-              <div class="input-container ic1">
-                <input id="usernmae" class="input" type="text" placeholder=" " />
-                <div class="cut"></div>
-                <label for="usernmae" class="placeholder">Username</label>
-              </div>
-              <div class="input-container ic2">
-                <input id="name" class="input" type="text" placeholder=" " />
-                <div class="cut"></div>
-                <label for="name" class="placeholder">Name</label>
-              </div>
-              <div class="input-container ic3">
-                  <select class="input" name="">
-                      <optgroup>
-                          <!-- <option selected>SELECT HOSTEL</option> -->
-                          <option value="none" selected disabled hidden style='color: #888'>Select Hostel</option>
-                          <option value="A">HOSTEL A</option>
-                          <option value="B">HOSTEL B</option>
-                          <option value="C">HOSTEL C</option>
-                          <option value="D">HOSTEL D</option>
-                          <option value="E">HOSTEL E</option>
-                          <option value="F">HOSTEL F</option>
-                          <option value="G">HOSTEL G</option>
-                          <option value="mega2">MHB 2</option>
-                          <option value="girls1">LH</option>
-                          <option value="girls2">MLH</option>
-                      </optgroup>
+              <p class="error" style="font-size:18px; color:rgb(211, 50, 50)" text-align="center" id="error">
+                {{error}}
+              </p>
+              <form method="POST" class="ahm_form">
+                {% csrf_token %}
+                <div class="input-container ic1">
+                  <input name="username" id="usernmae" class="input" type="text" placeholder=" " />
+                  <div class="cut"></div>
+                  <label for="usernmae" class="placeholder">Username</label>
+                </div>
+                <div class="input-container ic2">
+                  <input name="name" id="name" class="input" type="text" placeholder=" " />
+                  <div class="cut"></div>
+                  <label for="name" class="placeholder">Name</label>
+                </div>
+                <div class="input-container ic3">
+                  <select class="input" name="hostel">
+                    <optgroup>
+                      <!-- <option selected>SELECT HOSTEL</option> -->
+                      <option value="none" selected disabled hidden style='color: #888'>Select Hostel</option>
+                      <option value="1">HOSTEL A</option>
+                      <option value="2">HOSTEL B</option>
+                      <option value="3">HOSTEL C</option>
+                      <option value="4">HOSTEL D</option>
+                      <option value="5">HOSTEL E</option>
+                      <option value="6">HOSTEL F</option>
+                      <option value="7">HOSTEL G</option>
+                      <option value="8">HOSTEL PG I</option>
+                      <option value="9">HOSTEL PG II</option>
+                      <option value="10">MHB 2</option>
+                      <option value="11">LH</option>
+                      <option value="12">MLH</option>
+                    </optgroup>
                   </select>
-              </div>
-              <div class="input-container ic2">
-                <input id="Password" class="input" type="text" placeholder=" " />
-                <div class="cut cut-short"></div>
-                <label for="Password" class="placeholder">Password</label>
-              </div>
-              <button type="text" class="submit">Submit</button>
+                </div>
+                <div class="input-container ic2">
+                  <input name="password" id="Password" class="input" type="password" placeholder=" " />
+                  <div class="cut cut-short"></div>
+                  <label for="Password" class="placeholder">Password</label>
+                </div>
+                <button type="submit" class="submit">Submit</button>
+              </form> 
             </div>
           </div>
       </div>

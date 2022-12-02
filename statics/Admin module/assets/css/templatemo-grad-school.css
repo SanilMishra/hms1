@@ -254,6 +254,15 @@ a.menu-link { display: none; }
   transition: all 0.5s;
 }
 
+.main-menu li .sub-menu4 {
+  position: absolute;
+  width: 195px;
+  background-color: #00d5ff47;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.5s;
+}
+
 .main-menu li:hover .sub-menu {
     opacity: 1;
     visibility: visible;
@@ -265,6 +274,11 @@ a.menu-link { display: none; }
 }
 
 .main-menu li:hover .sub-menu3 {
+  opacity: 1;
+  visibility: visible;
+}
+
+.main-menu li:hover .sub-menu4 {
   opacity: 1;
   visibility: visible;
 }
@@ -299,6 +313,16 @@ a.menu-link { display: none; }
   border-bottom: 1px solid #121b2f;
 }
 
+.main-menu li .sub-menu4 li {
+  display: block;
+  text-align: center;
+  line-height: 20px;
+  margin-left: 0px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #121b2f;
+}
+
 .main-menu li .sub-menu li:first-child {
     padding-top: 15px;
 }
@@ -308,6 +332,10 @@ a.menu-link { display: none; }
 }
 
 .main-menu li .sub-menu3 li:first-child {
+  padding-top: 15px;
+}
+
+.main-menu li .sub-menu4 li:first-child {
   padding-top: 15px;
 }
 
@@ -322,6 +350,11 @@ a.menu-link { display: none; }
 }
 
 .main-menu li .sub-menu3 li:last-child {
+  margin-bottom: 0px;
+  border-bottom: none;
+}
+
+.main-menu li .sub-menu4 li:last-child {
   margin-bottom: 0px;
   border-bottom: none;
 }
@@ -356,6 +389,16 @@ a.menu-link { display: none; }
   transition: all 0.5s;
 }
 
+.main-menu li .sub-menu4 li a {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 0px 15px;
+  letter-spacing: 0.5px;
+  border: none;
+  
+  transition: all 0.5s;
+}
+
 .main-menu li .sub-menu li a:hover {
     color: #000;
     border: none;
@@ -367,6 +410,11 @@ a.menu-link { display: none; }
 }
 
 .main-menu li .sub-menu3 li a:hover {
+  color: #000;
+  border: none;
+}
+
+.main-menu li .sub-menu4 li a:hover {
   color: #000;
   border: none;
 }

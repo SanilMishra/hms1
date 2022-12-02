@@ -33,7 +33,7 @@
   <a href="#menu" class="menu-link"><i class="fa fa-bars"></i></a>
   <nav id="menu" class="main-nav" role="navigation">
     <ul class="main-menu">
-      <li><a href="#section1">Home</a></li>
+      <li><a href="{% url "HostelDesk:admin_module" %}">Home</a></li>
       <li class="has-submenu"><a href="#section2">Manage Hostels</a>
         <ul class="sub-menu">
           <li><a href="{% url "HostelDesk:ahm" %}" rel="sponsored" class="external">Appoint Hostel Manager</a></li>
@@ -49,11 +49,15 @@
       <li class="has-submenu"><a href="#section2">Manage Students</a>
         <ul class="sub-menu3">
           <li><a href="#" rel="sponsored" class="external">View Student Records</a></li>
-          <li><a href="#" rel="sponsored" class="external">Edit Student Records</a></li>
           <li><a href="#" rel="sponsored" class="external">Expel Student</a></li>
         </ul>
       </li>
-      <li><a href="{% url "HostelDesk:index" %}" class="external">Logout</a></li>
+      <li class="has-submenu"><a href="#section2">Admininstrator</a>
+        <ul class="sub-menu3">
+          <li><a href="{% url "HostelDesk:change_password" %}" rel="sponsored" class="external">Change Password</a></li>
+          <li><a href="{% url "HostelDesk:index" %}" rel="sponsored" class="external">Logout</a></li>
+        </ul>
+      </li>
     </ul>
   </nav>
   </header>

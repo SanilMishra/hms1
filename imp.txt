@@ -1,0 +1,3 @@
+delete from student_allocation_h;
+update room_details
+set status=0;
