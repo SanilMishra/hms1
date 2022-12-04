@@ -12,13 +12,13 @@
   <title>Mess Application</title>
 
   <!-- Bootstrap core CSS -->
-  <link href="{% static "Application hostel/vendor/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
+  <link href="{% static "Application mess/vendor/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
 
   <!-- Additional CSS Files -->
-  <link rel="stylesheet" href="{% static "Application hostel/assets/css/fontawesome.css" %}">
-  <link rel="stylesheet" href="{% static "Application hostel/assets/css/templatemo-grad-school.css" %}">
-  <link rel="stylesheet" href="{% static "Application hostel/assets/css/owl.css" %}">
-  <link rel="stylesheet" href="{% static "Application hostel/assets/css/lightbox.css" %}">
+  <link rel="stylesheet" href="{% static "Application mess/assets/css/fontawesome.css" %}">
+  <link rel="stylesheet" href="{% static "Application mess/assets/css/templatemo-grad-school.css" %}">
+  <link rel="stylesheet" href="{% static "Application mess/assets/css/owl.css" %}">
+  <link rel="stylesheet" href="{% static "Application mess/assets/css/lightbox.css" %}">
 </head>
 
 
@@ -51,14 +51,17 @@
   <!-- ***** Main Banner Area Start ***** -->
   <section class="section main-banner" id="top" data-section="section1">
       <video autoplay muted loop id="bg-video">
-          <source src="{% static "Application hostel/assets/images/header.mp4" %}" type="video/mp4" />
+          <source src="{% static "Application mess/assets/images/header.mp4" %}" type="video/mp4" />
       </video>
 
       <div class="video-overlay header-text">
           <div class="caption">
             <div class="form">
               <div class="title"><em>Mess</em> Allotment Form</div>
+              <p></p>
+              <p class="error" style="font-size:18px; color:rgb(211, 50, 50)" text-align="center" id="error">
               {{error}}
+              </p>
               <form method="POST" class="ahm_form">
                 {% csrf_token %}
                 <!-- <div class="input-container ic1">
@@ -76,19 +79,19 @@
                     <optgroup>
                       <!-- <option selected>SELECT HOSTEL</option> -->
                       <option value="none" selected disabled hidden style='color: #888'>Select Preferred Mess</option>
-                      <option value="A">MESS A</option>
-                      <option value="B">MESS B</option>
-                      <option value="C">MESS C</option>
-                      <option value="D">MESS D</option>
-                      <option value="E">MESS E</option>
-                      <option value="F">MESS F</option>
-                      <option value="G">MESS G</option>
-                      <option value="PG1">MESS PG 1</option>
-                      <option value="PG2">MESS PG 2</option>
-                      <option value="mega2f1">MHB 2 F1</option>
-                      <option value="mega2f2">MHB 2 F2</option>
-                      <option value="girls1">LH MESS</option>
-                      <option value="girls2">MLH MESS</option>
+                      <option value="Mess A">MESS A</option>
+                      <option value="Mess B">MESS B</option>
+                      <option value="Mess C">MESS C</option>
+                      <option value="Mess D">MESS D</option>
+                      <option value="Mess E">MESS E</option>
+                      <option value="Mess F">MESS F</option>
+                      <option value="Mess G">MESS G</option>
+                      <option value="Mess PG 1">MESS PG 1</option>
+                      <option value="Mess PG 2">MESS PG 2</option>
+                      <option value="MHB 2 F1">MHB 2 F1</option>
+                      <option value="MHB 2 F2">MHB 2 F2</option>
+                      <option value="LH MESS">LH MESS</option>
+                      <option value="MLH MESS">MLH MESS</option>
                     </optgroup>
                   </select>
                 </div>
@@ -117,16 +120,16 @@
 
   <!-- Scripts -->
   <!-- Bootstrap core JavaScript -->
-  <script src="{% static "Application hostel/vendor/jquery/jquery.min.js" %}"></script>
-  <script src="{% static "Application hostel/vendor/bootstrap/js/bootstrap.bundle.min.js" %}"></script>
+  <script src="{% static "Application mess/vendor/jquery/jquery.min.js" %}"></script>
+  <script src="{% static "Application mess/vendor/bootstrap/js/bootstrap.bundle.min.js" %}"></script>
 
-  <script src="{% static "Application hostel/assets/js/isotope.min.js" %}"></script>
-  <script src="{% static "Application hostel/assets/js/owl-carousel.js" %}"></script>
-  <script src="{% static "Application hostel/assets/js/lightbox.js" %}"></script>
-  <script src="{% static "Application hostel/assets/js/tabs.js" %}"></script>
-  <script src="{% static "Application hostel/assets/js/video.js" %}"></script>
-  <script src="{% static "Application hostel/assets/js/slick-slider.js" %}"></script>
-  <script src="{% static "Application hostel/assets/js/custom.js" %}"></script>
+  <script src="{% static "Application mess/assets/js/isotope.min.js" %}"></script>
+  <script src="{% static "Application mess/assets/js/owl-carousel.js" %}"></script>
+  <script src="{% static "Application mess/assets/js/lightbox.js" %}"></script>
+  <script src="{% static "Application mess/assets/js/tabs.js" %}"></script>
+  <script src="{% static "Application mess/assets/js/video.js" %}"></script>
+  <script src="{% static "Application mess/assets/js/slick-slider.js" %}"></script>
+  <script src="{% static "Application mess/assets/js/custom.js" %}"></script>
   <script>
       //according to loftblog tut
       $('.nav li:first').addClass('active');

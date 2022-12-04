@@ -82,12 +82,21 @@ create table Hostel_Manager(
 
 create table Mess_Details(
     M_Id integer PRIMARY KEY,
-    M_Name varchar(30)
+    M_Name varchar(30),
+    Allocated integer,
+    Capacity integer,
+    Accepted_Gender integer
 );
 
 create table Mess_Manager(
     Mm_Id varchar(9) PRIMARY KEY,
     Name varchar(40),
     M_Id integer,
+    foreign key (M_Id) references Mess_Details(M_Id) on update cascade on delete cascade
+);
+
+create table Student_Allocation_M(
+    M_Id integer,
+    Roll_No varchar(9),
     foreign key (M_Id) references Mess_Details(M_Id) on update cascade on delete cascade
 );

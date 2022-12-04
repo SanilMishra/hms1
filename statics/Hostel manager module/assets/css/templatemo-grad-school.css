@@ -229,7 +229,7 @@ a.menu-link { display: none; }
 
 .main-menu li .sub-menu {
     position: absolute;
-    width: 185px;
+    width: 250px;
     background-color: #00d5ff47;
     opacity: 0;
     visibility: hidden;
@@ -247,7 +247,7 @@ a.menu-link { display: none; }
 
 .main-menu li .sub-menu3 {
   position: absolute;
-  width: 195px;
+  width: 112px;
   background-color: #00d5ff47;
   opacity: 0;
   visibility: hidden;

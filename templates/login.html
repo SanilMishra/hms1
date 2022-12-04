@@ -22,7 +22,11 @@
             <div class="sign-up-content">
                 <form method="POST" class="signup-form">
                     {% csrf_token %}
+                    <div class="remove-line">
+                    <a href="{% url "HostelDesk:index" %}" class="loginhere-link">
                     <h2 class="form-title"><em>Hostel</em>Desk Login</h2>
+                    </a>
+                    </div>
                     <div class="form-radio">
                         <input type="radio" name="role" value="admin" id="newbie" checked="checked" />
                         <label for="newbie">Admin</label>

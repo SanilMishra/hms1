@@ -49,8 +49,7 @@
       <li class="has-submenu"><a href="#section2">Manage Students</a>
         <ul class="sub-menu3">
           <li><a href="#" rel="sponsored" class="external">View Student Records</a></li>
-          <li><a href="#" rel="sponsored" class="external">Edit Student Records</a></li>
-          <li><a href="#" rel="sponsored" class="external">Expel Student</a></li>
+          <li><a href="{% url "HostelDesk:expel_student" %}" rel="sponsored" class="external">Expel Student</a></li>
         </ul>
       </li>
       <li><a href="{% url "HostelDesk:index" %}" class="external">Logout</a></li>
@@ -68,7 +67,7 @@
           <div class="caption">
             <div class="form">
               <div class="title"><em>Appoint</em> Mess Manager</div>
-              <p class="error" style="color:rgb(211, 50, 50)" text-align="center" id="error">
+              <p class="error" style="font-size:18px; color:rgb(211, 50, 50)" text-align="center" id="error">
                 {{error}}
               </p>
               <form method="POST" class="amm_form">

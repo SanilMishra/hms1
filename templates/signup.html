@@ -25,17 +25,17 @@
                     <h2 class="form-title"><em>Hostel</em>Desk Signup</h2>
                     <p class="error" style="font-size:18px; color:rgb(211, 50, 50)" text-align="center" id="error">
                     {{error}}
-                    {{user_exists}}
+                    <!-- {{user_exists}} -->
                     </p>
                     <div class="form-textbox">
                         <label for="name">Name</label>
-                        <input type="text" name="name" id="round" />
+                        <input type="text" value = '{{name}}' name="name" id="round" />
                     </div>
 
                     <div id="rollgender" class="form-textbox">
                         <div class="form-textbox1 rollgender1">
                             <label for="rollno">Roll Number</label>
-                            <input type="text" name="rollno" id="round" />
+                            <input type="text" value = '{{rollno}}' name="rollno" id="round" />
                         </div>
                         <div class="form-textbox1 rollgender2">
                             <select class="sayooj" name="gender" >
@@ -74,22 +74,22 @@
 
                     <div id="round" class="form-textbox">
                         <label for="phno">Phone Number</label>
-                        <input type="text" name="phno" id="round" />
+                        <input type="text" value="{{phno}}" name="phno" id="round" />
                     </div>
 
                     <div id="round" class="form-textbox">
                         <label for="email">Institute Email</label>
-                        <input type="email" name="email" id="round" />
+                        <input type="email" value="{{email}}" name="email" id="round" />
                     </div>
 
                     <div id="round" class="form-textbox">
                         <label for="pass">Name of Parent/Guardian</label>
-                        <input class="npg" type="text" name="pname" id="round" />
+                        <input class="npg" value="{{pname}}" type="text" name="pname" id="round" />
                     </div>
 
                     <div id="round" class="form-textbox">
                         <label for="pass">Phone number of Parent/Guardian</label>
-                        <input class="ppg" type="text" name="p_phno" id="round" />
+                        <input class="ppg" value="{{p_phno}}" type="text" name="p_phno" id="round" />
                     </div>
 
                     <p></p>

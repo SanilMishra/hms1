@@ -25,7 +25,6 @@ def redirect_modules(role):
 
 def rollno_validation(rollno):
     rollno = rollno.lower()
-    print(rollno)
     masters = ['ar','ch','ce','cs','ca','ee','ec','me','mt','ma','cy','ph','ms']
     bachelors = ['cs','ee','ec','me','ep','ch','ar','bt','ce','mt','pe']
     if len(rollno)==9 and rollno[0].isalpha() and rollno[1:7].isdigit() and rollno[7:10].isalpha() and rollno[0] in ['b','m'] :
@@ -56,7 +55,7 @@ def index(request):
 
 
 '''****************************************************************************************************************************************************'''  
-
+#LOGIN
 def login(request):
     dict2 = {'admin':1,'student':2,'h_manager':3,'m_manager':4}
     dict1={'name':'','password':'','role':''}
@@ -67,7 +66,10 @@ def login(request):
         query = query.format(dict1['name'])
         cursor.execute(query)
         y = cursor.fetchall()
+        expel_password  = "ulsjy@lt$bj#nk$adf^nkiB307SGBD"
         if (len(y)!=0):
+            if y[0][0] == expel_password:
+                return render(request, "login.html",{'error':"User is expelled."})
             if (y[0][0]==dict1['password'] and y[0][1]==dict2[dict1['role']]):
                 role = dict2[dict1['role']]
                 request.session['user'] = [dict1['name'],role]
@@ -89,18 +91,25 @@ def login(request):
 
 #SIGNUP
 def signup(request):
-    # entered_details = {'name':[''],'rollno':[''],'gender':[''],'pass1':[''],'pass2':[''],'course':[''],'phno':[''],'email':[''],'pname':[''],'p_phno':['']}
     if request.method == "POST":
         entered_details = request.POST
-        for i in entered_details.values():
-            if i=='':
-                return render(request, "signup.html",{'user_exists':'','error':'Kindly enter all values.','pass_error':""})
+        returning_values = {'name':entered_details['name'],'rollno':entered_details['rollno'],'phno':entered_details['phno'],'email':entered_details['email'],'pname':entered_details['pname'],'p_phno':entered_details['p_phno'],'error':'','pass_error':''}
+        # for i in entered_details.values():
+            # if i=='':
+            #     returning_values['error'] = 'Kindly enter all values.'
+            #     return render(request, "signup.html",returning_values)
+        if len(entered_details.keys())<11:
+                returning_values['error'] = 'Kindly enter all values.'
+                return render(request, "signup.html",returning_values)
         if rollno_validation(entered_details['rollno'])== -1:
-            return render(request, "signup.html",{'error':'Invalid roll number.'})
+            returning_values['error'] = 'Invalid roll number.'
+            return render(request, "signup.html",returning_values)
         if (entered_details['pass1'] != entered_details['pass2']):
-            return render(request, "signup.html",{'user_exists':'','error':'','pass_error':"Passwords doesn't match."})
+            returning_values['pass_error'] = "Passwords doesn't match."
+            return render(request, "signup.html",returning_values)
         if email_validation(entered_details['email'],entered_details['rollno'])== -1:
-            return render(request, "signup.html",{'error':'Invalid institute email.'})
+            returning_values['error'] = 'Invalid institute email.'
+            return render(request, "signup.html",returning_values)
         else:
             cursor = connection.cursor()
             insert_query = "insert into student_details values ('{}','{}','{}','{}',{},'{}','{}',{})"
@@ -118,7 +127,8 @@ def signup(request):
                 cursor.execute(reg_login_query)
                 cursor.execute(insert_query)
             except IntegrityError:
-                return render(request, "signup.html",{'user_exists':'User already exists.'})
+                returning_values['error'] = 'Invalid institute email.'
+                return render(request, "signup.html",returning_values)
             return render(request,"signup_1.html")
     return render(request,"signup.html")
 
@@ -183,22 +193,76 @@ def application_h(request):
         return redirect("../login")
 
 
+
 def application_m(request):
     if request.session.has_key('user'):
         user_details = request.session['user']
         if user_details[1] == 2:
-            display_name = {'name':'Profile'}
-            cursor =  connection.cursor()
+            cursor = connection.cursor()
             query = "select name from student_details where roll_no = '{}';"
             query = query.format(user_details[0])
             cursor.execute(query)
-            y = cursor.fetchall()
-            if (len(y)!=0):
-                display_name['name'] = y[0][0]  
-            return render(request,"application_m.html",display_name)
+            display_name = cursor.fetchall()[0][0]
+            if request.method == "POST":
+                if 'mess' in request.POST:  
+                    pmess = request.POST['mess']
+                    roll_no = request.session['user'][0]
+
+                    query = "select gender from student_details where roll_no = '{}';"
+                    query = query.format(roll_no)
+                    cursor.execute(query)
+                    gender = cursor.fetchall()[0][0]
+                    if gender == 'M':
+                        gender = 1
+                    else:
+                        gender = 2
+
+                    query = "select * from student_allocation_m where roll_no = '{}';"
+                    query = query.format(roll_no)
+                    cursor.execute(query)
+                    present = len(cursor.fetchall())
+
+                    today = datetime.now().strftime("%d")
+                    if len(today) == 1:
+                        today = '0' + today
+
+                    if present and today < '25':
+                        return render(request,"application_m.html",{'error':"A mess is already allocated. Please wait till 25th.","name":display_name})
+
+                    query = "select capacity, allocated, accepted_gender, m_id from mess_details where m_name = '{}';"
+                    query = query.format(pmess)
+                    cursor.execute(query)
+                    mess_details = cursor.fetchall()
+                    
+                    if len(mess_details) == 0:
+                        return render(request,"application_m.html",{'error':"Kindly select a valid mess.","name":display_name})
+
+                    if gender != mess_details[0][2] and int(mess_details[0][2]) != 3:
+                        return render(request, "application_m.html", {'error':"Kindly select a mess with your gender","name":display_name})
+                    elif mess_details[0][0] > mess_details[0][1]:
+                        query = "update mess_details set allocated = '{}' where m_name = '{}';"
+                        query = query.format(mess_details[0][1] + 1, pmess)
+                        cursor.execute(query) 
+
+                        if present:
+                            query = "update student_allocation_m set m_id = '{}' where roll_no = '{}';"
+                            query = query.format(mess_details[0][3], roll_no)
+                            cursor.execute(query) 
+                        else:
+                            query = "insert into student_allocation_m values ('{}','{}');"
+                            query = query.format(mess_details[0][3], roll_no)
+                            cursor.execute(query)
+
+                        return render(request,"application_m_1.html")
+                    else:
+                        return render(request, "application_m.html", {'error':"There are no vacancies in the selected mess. Try another.","name":display_name})
+                else:
+                    return render(request,"application_m.html",{'error':"Kindly select a mess.","name":display_name})
+            else:
+                return render(request,"application_m.html", {"name":display_name})
         else:
             return redirect("../login")
-    else:
+    else: 
         return redirect("../login")
 
 '''****************************************************************************************************************************************************''' 
@@ -232,9 +296,11 @@ def ahm(request):
         if user_details[1] == 1:
             if request.method == "POST":
                 new_hm = request.POST
-                for i in new_hm.values():
-                    if i=='':
-                        return render(request, "ahm.html",{'error':'Kindly enter all values.'})
+                # for i in new_hm.values():
+                #     if i=='':
+                #         return render(request, "ahm.html",{'error':'Kindly enter all values.'})
+                if len(new_hm.keys())<5:
+                    return render(request, "ahm.html",{'error':'Kindly enter all values.'})
                 insert_query = "insert into hostel_manager values ('{}','{}','{}')"
                 reg_login_query = "insert into login_cred values ('{}','{}',3)"
                 insert_query = insert_query.format(new_hm['username'], new_hm['name'], new_hm['hostel'])
@@ -262,10 +328,14 @@ def rhm(request):
             if request.method == "POST":
                 remove_hm = request.POST
                 # print(remove_hm)
-                for i in remove_hm.values():
-                    if i=='':
-                        return render(request, "rhm.html",{'error':'Kindly enter all values.'})
-                select_query = "select * from login_cred where u_id = '{}'"
+                # for i in remove_hm.values():
+                #     if i=='':
+                #         return render(request, "rhm.html",{'error':'Kindly enter all values.'})
+                if len(remove_hm.keys())<3:
+                    return render(request, "rhm.html",{'error':'Kindly enter all values.'})
+                # get_hostel_query = "select hostel_id from hostel_manager where hm_id = '{}'"
+                # get_hostel_query = get_hostel_query.format(remove_hm['username'])
+                select_query = "select * from hostel_manager where hm_id = '{}'"
                 select_query = select_query.format(remove_hm['username'])
                 remove_query = "delete from hostel_manager where hm_id = '{}'"
                 remove_login_query = "delete from login_cred where u_id = '{}'"
@@ -276,6 +346,10 @@ def rhm(request):
                 y = cursor.fetchall()
                 if len(y)==0:
                     return render(request, "rhm.html",{'error':"User doesn't exist."})
+                # cursor.execute(get_hostel_query)
+                # y = cursor.fetchall()
+                if y[0][2] != int(remove_hm['hostel']):
+                    return render(request, "rhm.html",{'error':"Username and hostel doesn't match."})
                 cursor.execute(remove_query)
                 cursor.execute(remove_login_query)
                 return render(request, "rhm_1.html")
@@ -295,9 +369,11 @@ def amm(request):
             if request.method=="POST":
                 new_mm = request.POST
                 # print(new_mm)
-                for i in new_mm.values():
-                    if i=='':
-                        return render(request, "amm.html",{'error':'Kindly enter all values.'})
+                # for i in new_mm.values():
+                #     if i=='':
+                #         return render(request, "amm.html",{'error':'Kindly enter all values.'})
+                if len(new_mm.keys())<5:
+                    return render(request, "amm.html",{'error':'Kindly enter all values.'})
                 insert_query = "insert into mess_manager values ('{}','{}','{}')"
                 reg_login_query = "insert into login_cred values ('{}','{}',4)"
                 insert_query = insert_query.format(new_mm['username'], new_mm['name'], new_mm['mess'])
@@ -307,7 +383,7 @@ def amm(request):
                     cursor.execute(reg_login_query)
                     cursor.execute(insert_query)
                 except IntegrityError :
-                    return  render(request, "amm.html",{'error':'User already exists.'})
+                    return  render(request, "amm.html",{'error':'User already exists or mess already has a manager.'})
                 return render(request,"amm_1.html")
             return render(request,"amm.html")
         else:
@@ -324,20 +400,27 @@ def rmm(request):
         if user_details[1] == 1:
             if request.method == "POST":
                 remove_mm = request.POST
-                for i in remove_mm.values():
-                    if i=='':
-                        return render(request, "rmm.html",{'error':'Kindly enter all values.'})
-                select_query = "select * from login_cred where u_id = '{}'"
+                if len(remove_mm.keys())<3:
+                    return render(request, "rmm.html",{'error':'Kindly enter all values.'})
+                select_query = "select * from mess_manager where mm_id = '{}'"
                 select_query = select_query.format(remove_mm['username'])
                 remove_query = "delete from mess_manager where mm_id = '{}'"
                 remove_login_query = "delete from login_cred where u_id = '{}'"
                 remove_query = remove_query.format(remove_mm['username'])
                 remove_login_query = remove_login_query.format(remove_mm['username'])
+                # get_mess_query = "select mess_id from mess_manager where mm_id = '{}'"
+                # get_mess_query = get_mess_query.format(remove_mm['username'])
                 cursor = connection.cursor()
                 cursor.execute(select_query)
                 y = cursor.fetchall()
                 if len(y)==0:
                     return render(request, "rmm.html",{'error':"User doesn't exist."})
+                # cursor.execute(get_mess_query)
+                # y = cursor.fetchall()
+                # print(remove_mm)
+                # print(y[0][2])
+                if y[0][2] != int(remove_mm['mess']):
+                    return render(request, "rmm.html",{'error':"Username and mess doesn't match."})
                 cursor.execute(remove_query)
                 cursor.execute(remove_login_query)
                 return render(request, "rmm_1.html")
@@ -349,6 +432,7 @@ def rmm(request):
 
 '''****************************************************************************************************************************************************''' 
 
+#CHANGE PASSWORD
 def change_password(request):
     if request.session.has_key('user'):
         user_details = request.session['user']
@@ -519,3 +603,140 @@ def fuc(request,pfloor):
                 else:
                     a,b=get_free_room(z[0][0],pfloor,rollno)          
         return render(request,"application_h_1.html")
+
+'''**************************************************************************************************************************************************************'''
+def check_if_in_mess(rno,mess):
+    cursor =  connection.cursor()
+
+    query = "select * from student_allocation_m where roll_no='{}' and m_id={}"
+    query = query.format(rno,mess)
+    cursor.execute(query)
+    y = cursor.fetchall()
+    if(len(y)==0):
+        return -1
+    else:
+        return 1
+
+def view_enroll_m(request):
+    if request.session.has_key('user'):
+        user_details = request.session['user']
+        if user_details[1] == 4:
+            if request.method=="POST":
+                entered_detail=request.POST
+                rollno = entered_detail['roll_no']
+                if (rollno == ''):
+                    return render(request, 'view_enroll_m.html',{"error":"Kindly enter a roll number."})
+                if (rollno_validation(rollno)==-1):
+                    return render(request, 'view_enroll_m.html',{"error":"Invalid roll number."})
+                mm_id = user_details[0]
+                cursor = connection.cursor()
+                query = "select * from mess_manager where mm_id = '{}'"
+                query = query.format(mm_id)
+                cursor.execute(query)
+                y=cursor.fetchall()
+                mess=y[0][2]
+                a = check_if_in_mess(rollno,mess)
+                if a==-1:
+                    return render(request, 'view_enroll_m.html',{"error":"Student not enrolled in the mess."})
+                elif a==1:
+                    return render(request, 'view_enroll_m.html',{"message":"Student is enrolled in the mess."})
+            return render(request,"view_enroll_m.html")
+        else:
+            return redirect("../login")
+    else:
+        return redirect("../login")
+
+'''**************************************************************************************************************************************************************'''
+
+def view_enroll_h_rollno(request):
+    if request.session.has_key('user'):
+        user_details = request.session['user']
+        if user_details[1] == 3:
+            return render(request,"view_enroll_h_rollno.html")
+        else:
+            return redirect("../login")
+    else:
+        return redirect("../login")
+
+def view_enroll_h_rno(request):
+    if request.session.has_key('user'):
+        user_details = request.session['user']
+        if user_details[1] == 3:
+            return render(request,"view_enroll_h_rno.html")
+        else:
+            return redirect("../login")
+    else:
+        return redirect("../login")
+
+'''****************************************************************************************************************************************************'''
+
+#EXPEL STUDENT
+def expel_student(request):
+    if request.session.has_key('user'):
+        if request.method=="POST":
+            entered_details = request.POST
+            rollno = entered_details['rollno']
+            if (rollno == ''):
+                return render(request, 'expel_student.html',{"error":"Kindly enter all values."})
+            if (rollno_validation(rollno)==-1):
+                return render(request, 'expel_student.html',{"error":"Invalid roll number."})
+            vacate_hostel(rollno)
+            vacate_mess(rollno)
+            cursor = connection.cursor()
+            # delete_query = "delete from student_details where roll_no = '{}'"
+            # delete_query = delete_query.format(rollno)
+            # cursor.execute(delete_query)
+            expel_password  = "ulsjy@lt$bj#nk$adf^nkiB307SGBD"
+            update_query = "update login_cred set password = '{}' where u_id = '{}'"
+            update_query = update_query.format(expel_password,rollno)
+            cursor.execute(update_query)
+            return render(request, 'expel_student_1.html')
+    return render(request, 'expel_student.html')
+
+'''****************************************************************************************************************************************************'''
+
+def vacate_hostel(rno):
+    cursor = connection.cursor()
+    query = "select * from student_allocation_h where roll_no = '{}'"
+    query = query.format(rno)
+    cursor.execute(query)
+    y = cursor.fetchall()
+
+    if len(y)==1:
+        hid = y[0][0]
+        fid = y[0][1]
+        rid = y[0][2]
+
+        query = "update room_details set status = status-1 where h_id = {} and floor_id = {} and room_id = {}"
+        query = query.format(hid,fid,rid)
+        cursor.execute(query)
+
+        query = "update hostel_details set free_room = free_room+1 where h_id = {}"
+        query = query.format(hid)
+        cursor.execute(query)
+
+        query = "delete from student_allocation_h where roll_no = '{}'"
+        query = query.format(rno)
+        cursor.execute(query)
+    return 0
+
+def vacate_mess(rno):
+    cursor = connection.cursor()
+    query = "select * from student_allocation_m where roll_no = '{}'"
+    query = query.format(rno)
+    cursor.execute(query)
+    y = cursor.fetchall()
+
+    if len(y)==1:
+        mid = y[0][0]
+
+        query = "update mess_details set allocated=allocated-1 where m_id = {}"
+        query = query.format(mid)
+        cursor.execute(query)
+
+        query = "delete from student_allocation_m where roll_no = '{}'"
+        query = query.format(rno)
+        cursor.execute(query)
+    return 0
+
+'''****************************************************************************************************************************************************'''

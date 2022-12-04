@@ -31,7 +31,7 @@
   <!--header-->
   <header class="main-header clearfix" role="header">
     <div class="logo">
-      <a href="#"><em>Student</em> Module</a>
+      <a href="{% url "HostelDesk:student_module" %}"><em>Student</em> Module</a>
     </div>
     <a href="#menu" class="menu-link"><i class="fa fa-bars"></i></a>
     <nav id="menu" class="main-nav" role="navigation">
@@ -46,6 +46,7 @@
         <li class="has-submenu"><a href="#section2">{{name}}</a>
           <ul class="sub-menu3">
             <li><a href="#" rel="sponsored" class="external">Edit Profile</a></li>  
+            <li><a href="{% url "HostelDesk:change_password" %}" rel="sponsored" class="external">Change Password</a></li>
             <li><a href="{% url "HostelDesk:index" %}" rel="sponsored" class="external">Logout</a></li>
           </ul>
         </li>
