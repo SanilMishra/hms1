@@ -38,6 +38,7 @@
             <li><a href="{% url "HostelDesk:view_enroll_h_rno" %}" rel="sponsored" class="external">By Room</a></li>
           </ul>
         </li>
+        <li><a href="{% url "HostelDesk:vacate_student" %}" rel="sponsored" class="external">Vacate Student</a></li>
         <li class="has-submenu"><a href="#section2">Profile</a>
           <ul class="sub-menu3">
             <li><a href="{% url "HostelDesk:change_password" %}" rel="sponsored" class="external">Change Password</a></li>
@@ -67,7 +68,7 @@
               <form method="POST" class="view_enroll_h_rno">
                 {% csrf_token %}
                 <div class="input-container ic3">
-                  <select class="input" name="hostel">
+                  <select class="input" name="floor_id">
                     <optgroup>
                       <!-- <option selected>SELECT HOSTEL</option> -->
                       <option value="0" selected disabled hidden  style='color: #888'>Choose Floor</option>
@@ -84,7 +85,7 @@
                   </select>
                 </div>
                 <div class="input-container ic1">
-                  <input name="room_no" id="roll_no" class="input" type="text" placeholder=" " />
+                  <input name="room_id" id="roll_no" class="input" type="text" placeholder=" " />
                   <div class="cut"></div>
                   <label for="room_no" class="placeholder">Room Number</label>
                 </div>

@@ -48,11 +48,16 @@
       </li>
       <li class="has-submenu"><a href="#section2">Manage Students</a>
         <ul class="sub-menu3">
-          <li><a href="#" rel="sponsored" class="external">View Student Records</a></li>
+          <li><a href="{% url "HostelDesk:view_enroll_admin_rollno" %}" rel="sponsored" class="external">View Student Records</a></li>
           <li><a href="{% url "HostelDesk:expel_student" %}" rel="sponsored" class="external">Expel Student</a></li>
         </ul>
       </li>
-      <li><a href="{% url "HostelDesk:index" %}" class="external">Logout</a></li>
+      <li class="has-submenu"><a href="#section2">Admininstrator</a>
+        <ul class="sub-menu3">
+          <li><a href="{% url "HostelDesk:change_password" %}" rel="sponsored" class="external">Change Password</a></li>
+          <li><a href="{% url "HostelDesk:index" %}" rel="sponsored" class="external">Logout</a></li>
+        </ul>
+      </li>
     </ul>
   </nav>
   </header>

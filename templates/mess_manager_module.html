@@ -37,7 +37,12 @@
     <nav id="menu" class="main-nav" role="navigation">
       <ul class="main-menu">
         <li><a href="{% url "HostelDesk:mess_manager_module" %}">Home</a></li>
-        <li><a href="{% url "HostelDesk:view_enroll_m" %}" rel="sponsored" class="external">View Enrolled Students</a></li>
+        <li class="has-submenu"><a href="#section2">View Enrolled Students</a>
+          <ul class="sub-menu2">
+            <li><a href="{% url "HostelDesk:view_enroll_m" %}" rel="sponsored" class="external">Search by roll number</a></li>
+            <li><a href="{% url "HostelDesk:mm_get_students" %}" rel="sponsored" class="external">Download CSV</a></li>
+          </ul>
+        </li>
         <li class="has-submenu"><a href="#section2">Profile</a>
           <ul class="sub-menu3">
             <li><a href="{% url "HostelDesk:change_password" %}" rel="sponsored" class="external">Change Password</a></li>

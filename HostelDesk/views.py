@@ -8,6 +8,8 @@ from .models import *
 from datetime import datetime, timedelta
 from django.db import connection
 import random
+import csv
+import os
 
 def redirect_modules(role):
     if role == 1:
@@ -45,6 +47,13 @@ def email_validation(email,rollno):
         return -1
     else:
         return 1
+
+def ph_no_validation(ph_no):
+    ph_no = str(ph_no)
+    if (ph_no.isnumeric() and len(ph_no)==10):
+        return 1
+    else:
+        return -1
 
 # Create your views here.
 def index(request):
@@ -109,6 +118,9 @@ def signup(request):
             return render(request, "signup.html",returning_values)
         if email_validation(entered_details['email'],entered_details['rollno'])== -1:
             returning_values['error'] = 'Invalid institute email.'
+            return render(request, "signup.html",returning_values)
+        if ph_no_validation(entered_details['phno'])== -1 or ph_no_validation(entered_details['p_phno'])== -1:
+            returning_values['error'] = 'Invalid phone numner.'
             return render(request, "signup.html",returning_values)
         else:
             cursor = connection.cursor()
@@ -178,19 +190,26 @@ def application_h(request):
             y = cursor.fetchall()
             if (len(y)!=0):
                 display_name['name'] = y[0][0]
-            
-            if request.method=="POST":
-                entered_floor = request.POST
-                if len(entered_floor.keys())==1:
-                    display_name['error'] = 'Kindly choose a floor.'
-                    return render(request, "application_h.html",display_name)
-                pfloor = entered_floor['hostel']
-                return fuc(request, pfloor)
+                if request.method=="POST":
+                    entered_floor = request.POST
+                    if len(entered_floor.keys())==1:
+                        display_name['error'] = 'Kindly choose a floor.'
+                        return render(request, "application_h.html",display_name)
+                    pfloor = entered_floor['hostel']
+                    query = "select * from student_allocation_h where roll_no = '{}';"
+                    query = query.format(user_details[0])
+                    cursor.execute(query)
+                    y = cursor.fetchall()
+                    if(len(y)==0):
+                        return fuc(request, pfloor)
+                    else:
+                        display_name['error'] = 'You have already been alloted a room.'
+                        return render(request, "application_h.html",display_name) 
             return render(request,"application_h.html",display_name)
         else:
-            return redirect("../login")
+            return redirect("../../login")
     else:
-        return redirect("../login")
+        return redirect("../../login")
 
 
 
@@ -261,9 +280,9 @@ def application_m(request):
             else:
                 return render(request,"application_m.html", {"name":display_name})
         else:
-            return redirect("../login")
+            return redirect("../../login")
     else: 
-        return redirect("../login")
+        return redirect("../../login")
 
 '''****************************************************************************************************************************************************''' 
 
@@ -314,9 +333,9 @@ def ahm(request):
                 return render(request,"ahm_1.html")
             return render(request,"ahm.html")
         else:
-            return redirect("../login")
+            return redirect("../../login")
     else:
-        return redirect("../login")
+        return redirect("../../login")
 
 '''**************************************************************************************************************************************************************'''
 
@@ -355,9 +374,9 @@ def rhm(request):
                 return render(request, "rhm_1.html")
             return render(request,"rhm.html")
         else:
-            return redirect("../login")
+            return redirect("../../login")
     else:
-        return redirect("../login")
+        return redirect("../../login")
 
 '''**************************************************************************************************************************************************************'''
 
@@ -387,9 +406,9 @@ def amm(request):
                 return render(request,"amm_1.html")
             return render(request,"amm.html")
         else:
-            return redirect("../login")
+            return redirect("../../login")
     else:
-        return redirect("../login")
+        return redirect("../../login")
 
 '''**************************************************************************************************************************************************************'''
 
@@ -426,9 +445,9 @@ def rmm(request):
                 return render(request, "rmm_1.html")
             return render(request,"rmm.html")
         else:
-            return redirect("../login")
+            return redirect("../../login")
     else:
-        return redirect("../login")
+        return redirect("../../login")
 
 '''****************************************************************************************************************************************************''' 
 
@@ -458,6 +477,8 @@ def change_password(request):
                 cursor.execute(change_password_query)
                 return render(request, "change_password_1.html")
         return render(request,'change_password.html')
+    else:
+        return redirect("../login")
 
 '''****************************************************************************************************************************************************'''
 
@@ -642,59 +663,465 @@ def view_enroll_m(request):
                     return render(request, 'view_enroll_m.html',{"message":"Student is enrolled in the mess."})
             return render(request,"view_enroll_m.html")
         else:
-            return redirect("../login")
+            return redirect("../../login")
     else:
-        return redirect("../login")
+        return redirect("../../login")
+
 
 '''**************************************************************************************************************************************************************'''
 
+# DOWNLOAD MESS STUDENTS CSV
+def mm_get_students(request):
+    if request.session.has_key('user'):
+        user_details = request.session['user']
+        if user_details[1] == 4:
+            manager_name = user_details[0]
+            cursor = connection.cursor()
+
+            query = "select m_id from mess_manager where mm_id = '{}'"
+            query = query.format(manager_name)
+            cursor.execute(query)
+            m_id = cursor.fetchall()[0][0]
+
+            query = "select a.roll_no, b.name, a.m_id, b.ph_no, b.email from student_allocation_m as a, student_details as b where a.m_id = '{}' and a.roll_no = b.roll_no;"
+            query = query.format(m_id)
+            cursor.execute(query)
+            res = cursor.fetchall()
+            filename = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/statics/Mess manager module/assets/mess_students.csv'
+            with open(filename,'w',newline = '') as csvfile:
+                x = csv.writer(csvfile)
+                x.writerow(('Roll number','Name','Mess','Phone number','EmailID'))
+                x.writerows(res)
+                csvfile.close()
+            file = open(filename, 'rb')
+            response = HttpResponse(file, content_type='application/csv')
+            response['Content-Length'] = os.path.getsize(filename)
+            response['Content-Disposition'] = 'attachment; filename=%s' % 'Mess Students.csv'
+            return response
+    else:
+        return redirect("../login")
+
+
+'''**************************************************************************************************************************************************************'''
+
+#HM SEARCH STUDENT BY ROLLNO
 def view_enroll_h_rollno(request):
     if request.session.has_key('user'):
         user_details = request.session['user']
         if user_details[1] == 3:
-            return render(request,"view_enroll_h_rollno.html")
-        else:
-            return redirect("../login")
-    else:
-        return redirect("../login")
+            if request.method == "POST":
+                rno = request.POST['roll_no']
+                if rno == '':
+                    return render(request,"view_enroll_h_rollno.html",{'error':'Kindly enter all values.'})
+                else:      
+                    details = {}
+                    cursor = connection.cursor()
+                    
+                    query = "select * from student_details where roll_no = '{}';"
+                    query = query.format(rno)
+                    cursor.execute(query)
+                    res1 = cursor.fetchall()
 
+                    if len(res1) == 0:
+                        return render(request,"view_enroll_h_rollno.html",{'error': 'Student not registered.'})
+                    
+                    res1 = res1[0]
+                    
+                    query = "select h_id, floor_id, room_id from student_allocation_h where roll_no = '{}';"
+                    query = query.format(rno)
+                    cursor.execute(query)
+                    res2 = cursor.fetchall()
+
+                    query = "select a.h_id, b.h_name from hostel_manager as a, hostel_details as b where a.hm_id = '{}' and a.h_id=b.h_id;"
+                    query = query.format(request.session['user'][0])
+                    cursor.execute(query)
+                    hos = cursor.fetchall()[0]
+                    hid = hos[0]   
+                    hname = hos[1]
+
+                    if len(res2) == 0 or int(hid) != int(res2[0][0]):
+                        return render(request,"view_enroll_h_rollno.html",{'error': 'Student is not alloted to this hostel.'})
+
+                    res2 = res2[0]
+
+                    details['name'] = res1[0]
+                    details['roll_no'] = res1[1]
+                    details['gender'] = res1[2]
+                    details['course'] = res1[3]
+                    details['ph_no'] = res1[4]
+                    details['email'] = res1[5]
+                    details['p_name'] = res1[6]
+                    details['p_ph_no'] = res1[7]
+
+                    details['hostel'] = hname
+                    details['floor'] = res2[1]
+
+                    if(res2[2] < 10):
+                        details['room'] = '00' + str(res2[2])
+                    elif res2[2] < 100:
+                        details['room'] = '0' + str(res2[2])
+                    else:
+                        details['room'] = str(res2[2])
+
+                    if details['course'] == 1:
+                        details['course'] = "UG First Year"
+                    elif details['course'] == 2:
+                        details['course'] = "UG Second Year"
+                    elif details['course'] == 3:
+                        details['course'] = "UG Third Year"
+                    elif details['course'] == 4:
+                        details['course'] = "UG Fourth Year"
+                    elif details['course'] == 5:
+                        details['course'] = "PG First Year"
+                    else:
+                        details['course'] = "PG Second Year"            
+
+                    return render(request,"display_enroll_h_rollno.html",details)
+            else:
+                return render(request,"view_enroll_h_rollno.html")
+        else:
+            return redirect("../../login")
+    else:
+        return redirect("../../login")
+
+
+'''**************************************************************************************************************************************************************'''
+
+#HM SEARCH STUDENTS IN ROOM NO
 def view_enroll_h_rno(request):
     if request.session.has_key('user'):
         user_details = request.session['user']
         if user_details[1] == 3:
-            return render(request,"view_enroll_h_rno.html")
+            if request.method == "POST":
+                details = {'name1':"-",'roll_no1':"-",'gender1':"-",'course1':"-",'ph_no1':"-",'email1':"-",'p_name1':"-",'p_ph_no1':"-",
+                            'hostel':"-",'floor':"-",'room':"-",'name2':"-",'roll_no2':"-",'gender2':"-",'course2':"-",'ph_no2':"-",'email2':"-",'p_name2':"-",'p_ph_no2':"-",}
+                fid=request.POST['floor_id']
+                rid=request.POST['room_id']
+                if fid == '' or rid=='':
+                    return render(request,"view_enroll_h_rno.html",{'error':'Kindly enter all values.'})
+                else:      
+                    cursor = connection.cursor()
+
+                    query = "select a.h_id, b.h_name from hostel_manager as a, hostel_details as b where a.hm_id = '{}' and a.h_id=b.h_id;"
+                    query = query.format(request.session['user'][0])
+                    cursor.execute(query)
+                    hos = cursor.fetchall()[0]
+                    hid = hos[0]   
+                    hname = hos[1]
+
+                    if (hname != 'MHB 2' and hname != 'MLH' and int(fid) > 3) or ((hname == 'MHB 2' or hname == 'MLH') and int(fid) > 9):
+                        return render(request,"view_enroll_h_rno.html",{'error':'Floor value exceeds number of hostel floors.'})
+                    if (hname != 'MHB 2' and hname != 'MLH' and int(rid) > 50) or ((hname == 'MHB 2' or hname == 'MLH') and int(rid) > 100):
+                        return render(request,"view_enroll_h_rno.html",{'error':'Room value exceeds number of hostel rooms on a floor.'})
+
+                    details['hostel'] = hname
+                    details['floor'] = fid
+                    details['room'] = '0'*(3-len(str(rid))) + str(rid)
+
+                    query = "select * from student_details,student_allocation_h where student_details.roll_no=student_allocation_h.roll_no and h_id='{}' and floor_id='{}' and room_id='{}'"
+                    query = query.format(hid,fid,rid)
+                    cursor.execute(query)
+                    res = cursor.fetchall()
+                    if len(res) >= 1:
+                        res1=res[0]
+                        details['name1'] = res1[0]
+                        details['roll_no1'] = res1[1]
+                        details['gender1'] = res1[2]
+                        details['course1'] = res1[3]
+                        details['ph_no1'] = res1[4]
+                        details['email1'] = res1[5]
+                        details['p_name1'] = res1[6]
+                        details['p_ph_no1'] = res1[7]
+                        
+                        if details['course1'] == 1:
+                            details['course1'] = "UG First Year"
+                        elif details['course1'] == 2:
+                            details['course1'] = "UG Second Year"
+                        elif details['course1'] == 3:
+                            details['course1'] = "UG Third Year"
+                        elif details['course1'] == 4:
+                            details['course1'] = "UG Fourth Year"
+                        elif details['course1'] == 5:
+                            details['course1'] = "PG First Year"
+                        else:
+                            details['course1'] = "PG Second Year"
+
+                    if len(res) == 2:
+                        res2=res[1]
+                        details['name2'] = res2[0]
+                        details['roll_no2'] = res2[1]
+                        details['gender2'] = res2[2]
+                        details['course2'] = res2[3]
+                        details['ph_no2'] = res2[4]
+                        details['email2'] = res2[5]
+                        details['p_name2'] = res2[6]
+                        details['p_ph_no2'] = res2[7]
+                        
+                        if details['course2'] == 1:
+                            details['course2'] = "UG First Year"
+                        elif details['course2'] == 2:
+                            details['course2'] = "UG Second Year"
+                        elif details['course2'] == 3:
+                            details['course2'] = "UG Third Year"
+                        elif details['course2'] == 4:
+                            details['course2'] = "UG Fourth Year"
+                        elif details['course2'] == 5:
+                            details['course2'] = "PG First Year"
+                        else:
+                            details['course2'] = "PG Second Year"
+                    
+                    print(details)
+                    return render(request,"view_enroll_h_rno_1.html",details)
+
+            else:
+                return render(request,"view_enroll_h_rno.html")
         else:
-            return redirect("../login")
+            return redirect("../../login")
     else:
-        return redirect("../login")
+        return redirect("../../login")
+
+'''****************************************************************************************************************************************************'''
+
+#ADMIN SEARCH BY ROLLNO
+def view_enroll_admin_rollno(request):
+    if request.session.has_key('user'):
+        user_details = request.session['user']
+        if user_details[1] == 1:
+            if request.method == "POST":
+                rno = request.POST['roll_no']
+                if rno == '':
+                    return render(request,"view_enroll_admin_rollno.html",{'error':'Kindly enter a roll number.'})
+                else:      
+                    details = {}
+                    cursor = connection.cursor()
+                    
+                    query = "select * from student_details where roll_no = '{}';"
+                    query = query.format(rno)
+                    cursor.execute(query)
+                    res1 = cursor.fetchall()
+
+                    if len(res1) == 0:
+                        return render(request,"view_enroll_admin_rollno.html",{'error':'Student not registered'})
+
+                    res1 = res1[0]
+                     
+                    query = "select b.h_name, a.floor_id, a.room_id from student_allocation_h as a, hostel_details as b where a.roll_no = '{}' and a.h_id = b.h_id;"
+                    query = query.format(rno)
+                    cursor.execute(query)
+                    res2 = cursor.fetchall()
+                    
+                    query = "select b.m_name from student_allocation_m as a, mess_details as b  where a.roll_no = '{}' and a.m_id = b.m_id;"
+                    query = query.format(rno)
+                    cursor.execute(query)
+                    res3 = cursor.fetchall()
+
+                    details['name'] = res1[0]
+                    details['roll_no'] = res1[1]
+                    details['gender'] = res1[2]
+                    details['course'] = res1[3]
+                    details['ph_no'] = res1[4]
+                    details['email'] = res1[5]
+                    details['p_name'] = res1[6]
+                    details['p_ph_no'] = res1[7]
+
+                    if len(res2):
+                        res2 = res2[0]
+                        details['hostel'] = res2[0]
+                        details['floor'] = res2[1]
+                        details['room'] = '0'*(3-len(str(res2[2]))) + str(res2[2])
+                    else:
+                        details['hostel'] = "N/A"
+                        details['floor'] = "N/A"
+                        details['room'] = "N/A"
+
+                    if len(res3):
+                        details['mess'] = res3[0][0]
+                    else:
+                        details['mess'] = "N/A"
+
+                    if details['course'] == 1:
+                        details['course'] = "UG First Year"
+                    elif details['course'] == 2:
+                        details['course'] = "UG Second Year"
+                    elif details['course'] == 3:
+                        details['course'] = "UG Third Year"
+                    elif details['course'] == 4:
+                        details['course'] = "UG Fourth Year"
+                    elif details['course'] == 5:
+                        details['course'] = "PG First Year"
+                    else:
+                        details['course'] = "PG Second Year"                     
+
+                    return render(request,"display_enroll_admin_rollno.html",details)
+            else:
+                return render(request,"view_enroll_admin_rollno.html")
+        else:
+            return redirect("../../login")
+    else:
+        return redirect("../../login")
+
+'''****************************************************************************************************************************************************'''
+
+# STUDENT VIEW AND UPDATE PROFILE
+def student_profile(request):
+    if request.session.has_key('user'):
+        user_details = request.session['user']
+        if user_details[1] == 2:
+            details = {'error': ''}
+            if request.method == "POST":
+                roll_no = request.session['user'][0]
+                new_details = request.POST
+                
+                for i in new_details.values():
+                    if i == '':
+                        details['error'] = 'Kindly enter all values.'
+                        break
+                if not(new_details['ph_no'].isnumeric and len(new_details['ph_no']) == 10) or not(new_details['p_ph_no'].isnumeric and len(new_details['p_ph_no']) == 10):
+                    details['error'] = 'Phone numbers should be ten-digit Indian phone numbers.'
+                if details['error'] == '':
+                    cursor = connection.cursor()
+                    print(new_details)
+                    query = "update student_details set name = '{}', course_id = '{}', ph_no = '{}', p_name = '{}', p_ph_no = '{}' where roll_no = '{}';"
+                    query = query.format(new_details['name'],new_details['course'],new_details['ph_no'],new_details['p_name'],new_details['p_ph_no'],roll_no)
+                    cursor.execute(query)
+                    return render(request,"student_profile_1.html")
+
+            roll_no = request.session['user'][0]
+            cursor = connection.cursor()
+            
+            query = "select * from student_details where roll_no = '{}';"
+            query = query.format(roll_no)
+            cursor.execute(query)
+            res1 = cursor.fetchall()[0]
+            
+            query = "select b.h_name, a.floor_id, a.room_id from student_allocation_h as a, hostel_details as b where a.roll_no = '{}' and a.h_id = b.h_id;"
+            query = query.format(roll_no)
+            cursor.execute(query)
+            res2 = cursor.fetchall()
+            
+            query = "select b.m_name from student_allocation_m as a, mess_details as b where a.roll_no = '{}' and a.m_id = b.m_id;"
+            query = query.format(roll_no)
+            cursor.execute(query)
+            res3 = cursor.fetchall()
+
+            details['name'] = res1[0]
+            details['roll_no'] = res1[1]
+            details['gender'] = res1[2]
+            details['course'] = res1[3]
+            details['ph_no'] = res1[4]
+            details['email'] = res1[5]
+            details['p_name'] = res1[6]
+            details['p_ph_no'] = res1[7]
+            
+            if len(res2):
+                res2 = res2[0]
+                details['hostel'] = res2[0]
+                details['floor'] = res2[1]
+                details['room'] = '0'*(3-len(str(res2[2]))) + str(res2[2])
+            else:
+                details['hostel'] = "N/A"
+                details['floor'] = "N/A"
+                details['room'] = "N/A"
+
+            if len(res3):
+                details['mess'] = res3[0][0]
+            else:
+                details['mess'] = "N/A"
+
+            if details['course'] == 1:
+                details['course'] = "UG 1st Year"
+                details['course_id'] = 1
+            elif details['course'] == 2:
+                details['course'] = "UG 2nd Year"
+                details['course_id'] = 2
+            elif details['course'] == 3:
+                details['course'] = "UG 3rd Year"
+                details['course_id'] = 3
+            elif details['course'] == 4:
+                details['course'] = "UG 4th Year"
+                details['course_id'] = 4
+            elif details['course'] == 5:
+                details['course'] = "PG 1st Year"
+                details['course_id'] = 5
+            else:
+                details['course'] = "PG 2nd Year"            
+                details['course_id'] = 6
+
+            return render(request,"student_profile.html",details)
+        else:
+            return redirect_modules("../../login")
+    else:
+        return redirect("../../login")
 
 '''****************************************************************************************************************************************************'''
 
 #EXPEL STUDENT
 def expel_student(request):
     if request.session.has_key('user'):
-        if request.method=="POST":
-            entered_details = request.POST
-            rollno = entered_details['rollno']
-            if (rollno == ''):
-                return render(request, 'expel_student.html',{"error":"Kindly enter all values."})
-            if (rollno_validation(rollno)==-1):
-                return render(request, 'expel_student.html',{"error":"Invalid roll number."})
-            vacate_hostel(rollno)
-            vacate_mess(rollno)
-            cursor = connection.cursor()
-            # delete_query = "delete from student_details where roll_no = '{}'"
-            # delete_query = delete_query.format(rollno)
-            # cursor.execute(delete_query)
-            expel_password  = "ulsjy@lt$bj#nk$adf^nkiB307SGBD"
-            update_query = "update login_cred set password = '{}' where u_id = '{}'"
-            update_query = update_query.format(expel_password,rollno)
-            cursor.execute(update_query)
-            return render(request, 'expel_student_1.html')
-    return render(request, 'expel_student.html')
+        user_details = request.session['user']
+        if user_details[1] == 1:
+            if request.method=="POST":
+                entered_details = request.POST
+                rollno = entered_details['rollno']
+                if (rollno == ''):
+                    return render(request, 'expel_student.html',{"error":"Kindly enter all values."})
+                if (rollno_validation(rollno)==-1):
+                    return render(request, 'expel_student.html',{"error":"Invalid roll number."})
+                vacate_hostel(rollno)
+                vacate_mess(rollno)
+                cursor = connection.cursor()
+                expel_password  = "ulsjy@lt$bj#nk$adf^nkiB307SGBD"
+                update_query = "update login_cred set password = '{}' where u_id = '{}'"
+                update_query = update_query.format(expel_password,rollno)
+                cursor.execute(update_query)
+                return render(request, 'expel_student_1.html')
+            else:
+                return render(request, 'expel_student.html')
+        else: 
+            return redirect_modules("../../login")
+    else:
+        return redirect("../../login")
 
 '''****************************************************************************************************************************************************'''
 
+#VACATE STUDENT
+def vacate_student(request):
+    if request.session.has_key('user'):
+        user_details = request.session['user']
+        if user_details[1] == 3:
+            if request.method=="POST":
+                entered_details = request.POST
+                rollno = entered_details['rollno']
+                if (rollno == ''):
+                    return render(request, 'vacate_student.html',{"error":"Kindly enter all values."})
+                if (rollno_validation(rollno)==-1):
+                    return render(request, 'vacate_student.html',{"error":"Invalid roll number."})
+                hmid = request.session['user'][0]
+                cursor = connection.cursor()
+                query = "select * from hostel_manager where hm_id = '{}'"
+                query = query.format(hmid)
+                cursor.execute(query)
+                y = cursor.fetchall()
+
+                hid=y[0][2]
+
+                query = "select * from student_allocation_h where roll_no = '{}' and h_id={}"
+                query = query.format(rollno,hid)
+                cursor.execute(query)
+                y = cursor.fetchall()
+
+                if(len(y)==0):
+                    return render(request, 'vacate_student.html',{"error":"Student not alloted to your hostel"})
+                vacate_hostel(rollno)
+                return render(request, 'vacate_student_1.html')
+            else:
+                return render(request, 'vacate_student.html')
+        else: 
+            return redirect_modules("../../login")
+    else:
+        return redirect("../../login")
+
+'''****************************************************************************************************************************************************'''
 def vacate_hostel(rno):
     cursor = connection.cursor()
     query = "select * from student_allocation_h where roll_no = '{}'"

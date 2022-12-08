@@ -45,7 +45,7 @@
         </li>
         <li class="has-submenu"><a href="#section2">{{name}}</a>
           <ul class="sub-menu3">
-            <li><a href="#" rel="sponsored" class="external">Edit Profile</a></li>  
+            <li><a href="{% url "HostelDesk:student_profile" %}" rel="sponsored" class="external">Edit Profile</a></li>  
             <li><a href="{% url "HostelDesk:change_password" %}" rel="sponsored" class="external">Change Password</a></li>
             <li><a href="{% url "HostelDesk:index" %}" rel="sponsored" class="external">Logout</a></li>
           </ul>
